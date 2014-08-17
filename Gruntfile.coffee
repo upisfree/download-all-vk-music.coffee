@@ -10,6 +10,8 @@ module.exports = (grunt) ->
         files:
           'build/server.js': [
             'src/config.coffee'
+            'src/auth.coffee'
+            'src/database.coffee'
             'src/index.coffee'            
           ]
     
