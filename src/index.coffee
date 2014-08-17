@@ -9,6 +9,9 @@ if fs.existsSync config.file.auth
 else
   auth()
 
+if not fs.stat config.folder.audio
+  fs.mkdir config.folder.audio
+
 #database.update __userId, __token
 
 download 299652493, __userId, __token

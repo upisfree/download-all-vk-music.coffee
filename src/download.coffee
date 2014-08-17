@@ -1,6 +1,6 @@
 progress = require 'request-progress'
 
-_download = (link) ->
+_download = (link, name) ->
   # Clear console
   console.clear()
 
@@ -35,7 +35,7 @@ _download = (link) ->
     process.stdout.write line
   .on 'error', (err) ->
     console.error err
-  .pipe fs.createWriteStream __dirname + '/test.mp3'
+  .pipe fs.createWriteStream config.folder.audio + "#{name}.mp3"
   .on 'error', (err) ->
     console.error err
   .on 'close', (err) ->
@@ -47,4 +47,4 @@ download = (id, userId, token) ->
   request "https://api.vk.com/method/audio.getById?audios=#{userId}_#{id}&access_token=#{token}&v=#{config.vk.version}", (error, response, body) ->
     if not error and response.statusCode is 200
       json = JSON.parse body
-      _download json.response[0].url 
+      _download json.response[0].url, id
