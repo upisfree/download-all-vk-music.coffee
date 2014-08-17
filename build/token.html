@@ -1,0 +1,16 @@
+<script>
+// Convert params to array
+var params = location.hash.substr(1).split('&');
+
+for (var i = 0; i <= params.length - 1; i++)
+{
+  params[i] = params[i].split('=');
+};
+
+// Create get request
+var xhr = new XMLHttpRequest();
+
+xhr.open('POST', 'http://127.0.0.1:8080/?do=getToken&token=' + params[0][1] + '&userId=' + params[2][1], true)
+
+xhr.send('');
+</script>

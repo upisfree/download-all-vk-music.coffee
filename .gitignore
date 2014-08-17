@@ -1,0 +1,10 @@
+# Windows
+Thumbs.db
+ehthumbs.db
+
+# node
+node_modules
+
+# Logs
+logs
+*.log
