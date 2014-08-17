@@ -12,6 +12,7 @@ module.exports = (grunt) ->
             'src/config.coffee'
             'src/auth.coffee'
             'src/database.coffee'
+            'src/download.coffee'
             'src/index.coffee'            
           ]
     

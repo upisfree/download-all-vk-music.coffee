@@ -7,4 +7,6 @@ if fs.existsSync config.file.auth
 else
   auth()
 
-database.update __userId, __token
+#database.update __userId, __token
+
+download()

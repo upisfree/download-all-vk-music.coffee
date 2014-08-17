@@ -10,4 +10,4 @@ database =
         for j in json.response.items
           result.audio.push [j['id'], false]
 
-        fs.writeFile config.file.database, JSON.stringify result
+        fs.writeFileSync config.file.database, JSON.stringify result

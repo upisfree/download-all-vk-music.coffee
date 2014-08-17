@@ -2,7 +2,9 @@ config =
   file:
     #root: __dirname + '/'
     auth: __dirname + '/auth'
-    database: __dirname + '/audio'
+    database: __dirname + '/data'
+  folder:
+    audio: __dirname + '/audio/'
   vk:
     appId: 4509610
     permissions: 'audio,offline'
