@@ -1,3 +1,5 @@
+console = require 'better-console'
+
 if fs.existsSync config.file.auth
   a = fs.readFileSync config.file.auth, 'utf-8'
   a = a.split '\n'
@@ -9,4 +11,4 @@ else
 
 #database.update __userId, __token
 
-download()
+download 299652493, __userId, __token

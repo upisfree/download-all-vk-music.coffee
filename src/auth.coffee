@@ -25,7 +25,7 @@ auth = () ->
       when 'getTokenHtml'
         fs.readFile __dirname + '/token.html', (e, html) ->
           if e
-            console.log e
+            console.error e
 
           res.writeHead 200, {'Content-Type': 'text/html'}
           res.write html

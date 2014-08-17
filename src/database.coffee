@@ -11,3 +11,6 @@ database =
           result.audio.push [j['id'], false]
 
         fs.writeFileSync config.file.database, JSON.stringify result
+      else
+        console.error error
+      

@@ -1,7 +1,6 @@
 progress = require 'request-progress'
-console = require 'better-console'
 
-download = () ->
+_download = (link) ->
   # Clear console
   console.clear()
 
@@ -26,20 +25,26 @@ download = () ->
   , 100
 
   # Download
-  progress request 'https://psv4.vk.me/c536620/u223436253/audios/bc68997bb6ca.mp3' , ->
+  progress request link, ->
     throttle: 100
   .on 'progress', (state) ->
     process.stdout.cursorTo 0, 1
 
-    line = "#{state.received} / #{state.total}\n#{state.percent}%"
+    line = "#{state.received} / #{state.total}\n#{state.percent}%\n#{link}"
 
     process.stdout.write line
   .on 'error', (err) ->
-    console.log err
+    console.error err
   .pipe fs.createWriteStream __dirname + '/test.mp3'
   .on 'error', (err) ->
-    console.log err
+    console.error err
   .on 'close', (err) ->
     console.clear()
-    console.log 'Saved!'
+    console.info 'Saved!'
     clearInterval circle
+
+download = (id, userId, token) ->
+  request "https://api.vk.com/method/audio.getById?audios=#{userId}_#{id}&access_token=#{token}&v=#{config.vk.version}", (error, response, body) ->
+    if not error and response.statusCode is 200
+      json = JSON.parse body
+      _download json.response[0].url 
