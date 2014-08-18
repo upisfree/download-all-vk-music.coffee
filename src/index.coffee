@@ -2,7 +2,7 @@ console = require 'better-console'
 
 auth()
 
-if not fs.stat config.folder.audio
+if not fs.statSync config.folder.audio
   fs.mkdir config.folder.audio
 
 database.update global.__userId, global.__token
