@@ -1,8 +1,7 @@
 config =
   file:
     #root: __dirname + '/'
-    auth: __dirname + '/auth'
-    database: __dirname + '/data'
+    database: __dirname + '/data.json'
   folder:
     audio: __dirname + '/audio/'
   vk:

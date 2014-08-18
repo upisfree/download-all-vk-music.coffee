@@ -30,7 +30,7 @@ _download = (link, name) ->
   .on 'progress', (state) ->
     process.stdout.cursorTo 0, 1
 
-    line = "#{state.received} / #{state.total}\n#{state.percent}%\n#{link}"
+    line = "#{state.received} / #{state.total}\n#{state.percent}%\n#{name}"
 
     process.stdout.write line
   .on 'error', (err) ->
@@ -40,11 +40,12 @@ _download = (link, name) ->
     console.error err
   .on 'close', (err) ->
     console.clear()
-    console.info 'Saved!'
+    console.log "#{name} saved successful"
     clearInterval circle
 
 download = (id, userId, token) ->
   request "https://api.vk.com/method/audio.getById?audios=#{userId}_#{id}&access_token=#{token}&v=#{config.vk.version}", (error, response, body) ->
     if not error and response.statusCode is 200
       json = JSON.parse body
-      _download json.response[0].url, id
+      j = json.response[0]
+      _download j.url, j.artist + ' — ' + j.title

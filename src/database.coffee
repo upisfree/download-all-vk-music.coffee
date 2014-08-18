@@ -10,7 +10,21 @@ database =
         for j in json.response.items
           result.audio.push [j['id'], false]
 
-        fs.writeFileSync config.file.database, JSON.stringify result
+        database.write result
       else
         console.error error
-      
+  write: (data) ->
+    if fs.existsSync config.file.database
+      file = JSON.parse fs.readFileSync config.file.database
+    else
+      file = {}
+
+    for own key, value of data
+      file[key] = value
+    
+    fs.writeFileSync config.file.database, JSON.stringify file
+  read: ->
+    if fs.existsSync config.file.database
+      JSON.parse fs.readFileSync config.file.database
+    else
+      false
