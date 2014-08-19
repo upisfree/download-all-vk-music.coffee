@@ -6,7 +6,7 @@ open = require 'open'
 # Open auth page
 auth = () ->
   _database = database.read()
-  
+
   if not _database.userId or not _database.token # TODO: if user change pass, i need another token
     open "https://oauth.vk.com/authorize?\
       client_id=#{config.vk.appId}&\
@@ -23,6 +23,8 @@ auth = () ->
         when 'getToken'
           database.write {userId: query.userId, token: query.token}
 
+          console.log 'Auth completed successfully.'
+
           res.end()
 
         # Get token from html (this is bad solution (or govnokod (yeah, this is govnokod)))
@@ -35,6 +37,3 @@ auth = () ->
             res.write html
             res.end()
     .listen 8080
-  else
-    global.__userId = _database.userId
-    global.__token  = _database.token

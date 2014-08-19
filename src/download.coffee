@@ -1,7 +1,6 @@
 progress = require 'request-progress'
 
-_download = (link, name) ->
-  # Clear console
+_download = (link, name, userInfo, callback) ->
   console.clear()
 
   # Indicator
@@ -30,7 +29,7 @@ _download = (link, name) ->
   .on 'progress', (state) ->
     process.stdout.cursorTo 0, 1
 
-    line = "#{state.received} / #{state.total}\n#{state.percent}%\n#{name}"
+    line = "#{(state.received / (1024 * 1000)).toFixed(2)} mb / #{(state.total / (1024 * 1000)).toFixed(2)} mb\n#{state.percent}%\n#{userInfo[0]} of #{userInfo[1]}\n#{name}"
 
     process.stdout.write line
   .on 'error', (err) ->
@@ -40,12 +39,26 @@ _download = (link, name) ->
     console.error err
   .on 'close', (err) ->
     console.clear()
-    console.log "#{name} saved successful"
+    console.log "#{name} saved successful."
     clearInterval circle
 
-download = (id, userId, token) ->
-  request "https://api.vk.com/method/audio.getById?audios=#{userId}_#{id}&access_token=#{token}&v=#{config.vk.version}", (error, response, body) ->
-    if not error and response.statusCode is 200
-      json = JSON.parse body
-      j = json.response[0]
-      _download j.url, j.artist + ' — ' + j.title
+    callback()
+
+download = (id, userInfo, callback) ->
+  _database = database.read()
+  userId = _database.userId
+  token  = _database.token
+
+  if not userId or not token
+    console.error 'Download song failed because auth is not loaded now.\nTrying to restart download...'
+    setTimeout ->
+      download id, callback
+    , 1000
+  else
+    request "https://api.vk.com/method/audio.getById?audios=#{userId}_#{id}&access_token=#{token}&v=#{config.vk.version}", (error, response, body) ->
+      if not error and response.statusCode is 200
+        json = JSON.parse body
+        j = json.response[0]
+        _download j.url, j.artist.replace(/—/, '-') + ' — ' + j.title.replace(/—/, '-'), userInfo, callback
+      else
+        console.error error

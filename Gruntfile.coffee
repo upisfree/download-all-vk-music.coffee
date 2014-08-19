@@ -8,7 +8,7 @@ module.exports = (grunt) ->
           join: true
           bare: true
         files:
-          'build/server.js': [
+          'build/<%= pkg.name %>.js': [
             'src/config.coffee'
             'src/auth.coffee'
             'src/database.coffee'
@@ -25,8 +25,8 @@ module.exports = (grunt) ->
 
     uglify:
       build:
-        src: 'build/server.js'
-        dest: 'build/server.min.js'
+        src: 'build/<%= pkg.name %>.js'
+        dest: 'build/<%= pkg.name %>.min.js'
 
     watch:
       coffee:
