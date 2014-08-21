@@ -4,7 +4,7 @@ url  = require 'url'
 open = require 'open'
 
 # Open auth page
-auth = () ->
+auth = (callback) ->
   _database = database.read()
 
   if not _database.userId or not _database.token # TODO: if user change pass, i need another token
@@ -24,6 +24,8 @@ auth = () ->
           database.write {userId: query.userId, token: query.token}
 
           console.log 'Auth completed successfully.'
+
+          callback()
 
           res.end()
 

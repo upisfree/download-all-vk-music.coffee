@@ -1,7 +1,5 @@
 console = require 'better-console'
 
-auth()
-
 if not fs.statSync config.folder.audio
   fs.mkdir config.folder.audio
   console.log config.folder.audio + ' created.'
@@ -19,7 +17,9 @@ _downloadAudio = (db, i) ->
         i++
         _downloadAudio db, i
 
-database.update ->
-  _database = database.read()
 
-  _downloadAudio _database, 0
+auth ->
+  database.update ->
+    _database = database.read()
+
+    _downloadAudio _database, 0

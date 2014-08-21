@@ -1,7 +1,5 @@
 request = require 'request'
 mm = require 'musicmetadata'
-_fq = require 'filequeue'
-fq = new _fq 100
 
 database =
   update: (callback) ->
@@ -29,7 +27,7 @@ database =
           
           database.cache.get (data) ->
             database.cache.write data
-
+            console.log callback
             callback()
         else
           console.error error
