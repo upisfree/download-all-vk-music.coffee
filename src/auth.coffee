@@ -5,9 +5,7 @@ open = require 'open'
 
 # Open auth page
 auth = (callback) ->
-  _database = database.read()
-
-  if not _database.userId or not _database.token # TODO: if user change pass, i need another token
+  if not tmp.userId or not tmp.token # TODO: if user change pass, I need another token
     open "https://oauth.vk.com/authorize?\
       client_id=#{config.vk.appId}&\
       scope=#{config.vk.permissions}&\
@@ -21,7 +19,8 @@ auth = (callback) ->
 
       switch query.do
         when 'getToken'
-          database.write {userId: query.userId, token: query.token}
+          tmp.userId = query.userId
+          tmp.token  = query.token
 
           console.log 'Auth completed successfully.'
 

@@ -3,6 +3,9 @@ progress = require 'request-progress'
 _download = (link, name, userInfo, callback) ->
   console.clear()
 
+  userInfo[0]++
+  userInfo[1]++
+
   # Indicator
   circleState = 0
   circle = setInterval ->
@@ -45,9 +48,8 @@ _download = (link, name, userInfo, callback) ->
     callback()
 
 download = (id, userInfo, callback) ->
-  _database = database.read()
-  userId = _database.userId
-  token  = _database.token
+  userId = tmp.userId
+  token  = tmp.token
 
   if not userId or not token
     console.error 'Download song failed because auth is not loaded now.\nTrying to restart download...'

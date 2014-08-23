@@ -1,25 +1,21 @@
 console = require 'better-console'
 
-if not fs.statSync config.folder.audio
+if not fs.existsSync config.folder.audio
   fs.mkdir config.folder.audio
   console.log config.folder.audio + ' created.'
 
-_downloadAudio = (db, i) ->
-  if db.audio[i].isCached is true
+_downloadAudio = (i) ->
+  if tmp.audio[i].isCached is true
     i++
-    _downloadAudio db, i
+    _downloadAudio i
   else
-    download db.audio[i].id, [i++, db.audio.length], ->
-      db.audio[i].isCached = true
-      database.write db
-
-      if i isnt db.length - 1
+    download tmp.audio[i].id, [i, tmp.audio.length], ->
+      if i isnt tmp.audio.length - 1
         i++
-        _downloadAudio db, i
-
+        _downloadAudio i
+      else
+        console.log 'All songs downloaded.'
 
 auth ->
   database.update ->
-    _database = database.read()
-
-    _downloadAudio _database, 0
+    _downloadAudio 0
