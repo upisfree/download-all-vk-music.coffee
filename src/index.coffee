@@ -1,8 +1,24 @@
 console = require 'better-console'
+prompt  = require 'prompt'
 
-if not fs.existsSync config.folder.audio
-  fs.mkdir config.folder.audio
-  console.log config.folder.audio + ' created.'
+prompt.colors = false
+prompt.message = prompt.delimiter = ''
+prompt.start()
+
+prompt.get {name: 'folder', description: 'Enter audio folder (with /):'}, (e, result) ->
+  if e
+    console.error e
+  else
+    config.audioFolder = result.folder
+
+    if not fs.existsSync config.audioFolder
+      fs.mkdir config.audioFolder, (e) ->
+        console.error e
+      console.log config.audioFolder + ' created.'
+
+    auth ->
+      database.update ->
+        _downloadAudio 0
 
 _downloadAudio = (i) ->
   if tmp.audio[i].isCached is true
@@ -15,7 +31,3 @@ _downloadAudio = (i) ->
         _downloadAudio i
       else
         console.log 'All songs downloaded.'
-
-auth ->
-  database.update ->
-    _downloadAudio 0

@@ -10,6 +10,7 @@ module.exports = (grunt) ->
         files:
           'build/<%= pkg.name %>.js': [
             'src/config.coffee'
+            'src/utils.coffee'
             'src/auth.coffee'
             'src/database.coffee'
             'src/download.coffee'

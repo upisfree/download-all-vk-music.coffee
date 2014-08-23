@@ -6,30 +6,24 @@ _download = (link, name, userInfo, callback) ->
   userInfo[0]++
   userInfo[1]++
 
-  # Indicator
-  circleState = 0
-  circle = setInterval ->
-    switch circleState
-      when 0
-        a = 'O o o'
-      when 1
-        a = 'o O o'
-      when 2
-        a = 'o o O'
-
-    process.stdout.cursorTo 0, 0
-    process.stdout.write a
-
-    if circleState is 2
-      circleState = 0
-    else
-      circleState++
-  , 100
-
   # Download
   progress request link, ->
     throttle: 100
   .on 'progress', (state) ->
+    process.stdout.cursorTo 0, 0
+
+    stripe = ''
+    a = process.stdout.columns
+    _a = a - 3 # [===>] -> ===
+    b = (_a * (state.percent / 100)).toFixed()
+    stripe += '['
+    stripe += '=' for [1..b]
+    stripe += '>'
+    stripe += ' ' for [1.._a - b]
+    stripe += ']'
+
+    process.stdout.write stripe
+
     process.stdout.cursorTo 0, 1
 
     line = "#{(state.received / (1024 * 1000)).toFixed(2)} mb / #{(state.total / (1024 * 1000)).toFixed(2)} mb\n#{state.percent}%\n#{userInfo[0]} of #{userInfo[1]}\n#{name}"
@@ -37,13 +31,12 @@ _download = (link, name, userInfo, callback) ->
     process.stdout.write line
   .on 'error', (err) ->
     console.error err
-  .pipe fs.createWriteStream config.folder.audio + "#{name}.mp3"
+  .pipe fs.createWriteStream config.audioFolder + "#{name}.mp3"
   .on 'error', (err) ->
     console.error err
   .on 'close', (err) ->
     console.clear()
     console.log "#{name} saved successful."
-    clearInterval circle
 
     callback()
 

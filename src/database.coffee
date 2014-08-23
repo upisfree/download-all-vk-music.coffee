@@ -36,7 +36,7 @@ database =
       artist = _meta[0]
       title  = _meta[1]
 
-      stream = fs.createReadStream config.folder.audio + a
+      stream = fs.createReadStream config.audioFolder + a
 
       mm stream, { duration: true } 
       .on 'metadata', (meta) ->
@@ -55,7 +55,7 @@ database =
         stream.destroy()
 
     get: (callback) ->
-      cachedList = fs.readdirSync config.folder.audio
+      cachedList = fs.readdirSync config.audioFolder
 
       for key, value of cachedList # remove
         cachedList.splice key, 1 if value is 'data.json'
