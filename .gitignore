@@ -8,6 +8,3 @@ node_modules
 # Logs
 logs
 *.log
-
-# Compilated files
-build
