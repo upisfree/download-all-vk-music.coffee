@@ -1,5 +1,5 @@
 request = require 'request'
-mm = require 'musicmetadata'
+taglib  = require 'taglib'
 
 database =
   update: (callback) ->
@@ -12,6 +12,8 @@ database =
         database.update()
       , 1000
     else
+      console.log 'Download song\'s list from VK...'
+
       request "https://api.vk.com/method/audio.get?owner_id=#{id}&access_token=#{token}&v=#{config.vk.version}", (error, response, body) ->
         if not error and response.statusCode is 200
           json = JSON.parse body
@@ -19,9 +21,9 @@ database =
           tmp.audio = []
 
           for j in json.response.items
-            tmp.audio.push {id: j.id, artist: j.artist.replace(/—/, '-'), title: j.title.replace(/—/, '-'), duration: j.duration, isCached: false}
+            tmp.audio.push {id: j.id, artist: j.artist.replace(/—/, '-'), title: j.title.replace(/—/, '-'), isCached: false}
 
-          console.log 'Id\'s sync completed successfully.'
+          console.log 'Song\'s list downloaded successfully.'
           
           database.cache.get (data) ->
             database.cache.write data
@@ -36,23 +38,19 @@ database =
       artist = _meta[0]
       title  = _meta[1]
 
-      stream = fs.createReadStream config.audioFolder + a
+      path = config.audioFolder + a
 
-      mm stream, { duration: true } 
-      .on 'metadata', (meta) ->
-        result.push {artist: artist, title: title, duration: meta.duration}
+      tag = taglib.tagSync path
 
-        if result.length is cachedList.length
-          callback result
-        else
-          database.cache._get ++i, cachedList, result, callback
-      .on 'done', (e) ->
-        if e
-          console.error e + "\nError with #{artist} — #{title}.mp3\nTry to delete it and restart."
+      item = {artist: artist, title: title}
+      item.id = if tag.comment then tag.comment.replace(/\n\n.*/, '').replace(/VK id: ([0-9]+)/, '$1') else ''
 
-        #console.log i, result[i]
+      result.push item
 
-        stream.destroy()
+      if result.length is cachedList.length
+        callback result
+      else
+        database.cache._get ++i, cachedList, result, callback
 
     get: (callback) ->
       cachedList = fs.readdirSync config.audioFolder
@@ -69,11 +67,10 @@ database =
       if cached.length isnt 0
         for a in tmp.audio
           for b in cached
-            if a.artist is b.artist and a.title is b.title
-              if a.duration is b.duration or a.duration + 1 is b.duration or a.duration - 1 is b.duration or b.duration is 0
-                #console.log a.duration + ', ' + b.duration
-                console.log "“#{a.artist} — #{a.title}” is cached."
-                a.isCached = true
+            if `a.id == b.id`
+              console.log "“#{a.artist} — #{a.title}” is cached."
+              a.isCached = true
+              break;
 
         console.log 'Wrote cached audio to database.'
       else

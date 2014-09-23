@@ -8,10 +8,10 @@
     "grunt-contrib-copy": "^0.5.0",
     "grunt-contrib-uglify": "^0.5.0",
     "grunt-contrib-watch": "^0.6.1",
-    "musicmetadata": "^0.4.5",
     "open": "0.0.5",
     "prompt": "^0.2.13",
     "request": "^2.40.0",
-    "request-progress": "^0.3.1"
+    "request-progress": "^0.3.1",
+    "taglib": "^0.8.0"
   }
 }

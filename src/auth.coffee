@@ -5,7 +5,7 @@ open = require 'open'
 
 # Open auth page
 auth = (callback) ->
-  if not tmp.userId or not tmp.token # TODO: if user change pass, I need another token
+  if not tmp.userId or not tmp.token
     open "https://oauth.vk.com/authorize?\
       client_id=#{config.vk.appId}&\
       scope=#{config.vk.permissions}&\

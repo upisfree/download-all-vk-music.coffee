@@ -1,7 +1,9 @@
-progress = require 'request-progress'
+progress   = require 'request-progress'
 
-_download = (link, name, userInfo, callback) ->
+_download = (link, name, id, userInfo, callback) ->
   console.clear()
+
+  path = config.audioFolder + "#{name}.mp3"
 
   userInfo[0]++
   userInfo[1]++
@@ -31,11 +33,16 @@ _download = (link, name, userInfo, callback) ->
     process.stdout.write line
   .on 'error', (err) ->
     console.error err
-  .pipe fs.createWriteStream config.audioFolder + "#{name}.mp3"
+  .pipe fs.createWriteStream path
   .on 'error', (err) ->
     console.error err
   .on 'close', (err) ->
     console.clear()
+
+    tag = taglib.tagSync path
+    tag.comment = "VK id: #{id}\n\n"
+    tag.saveSync()
+
     console.log "#{name} saved successful."
 
     callback()
@@ -54,6 +61,6 @@ download = (id, userInfo, callback) ->
       if not error and response.statusCode is 200
         json = JSON.parse body
         j = json.response[0]
-        _download j.url, j.artist.replace(/—/, '-') + ' — ' + j.title.replace(/—/, '-'), userInfo, callback
+        _download j.url, j.artist.replace(/—/, '-') + ' — ' + j.title.replace(/—/, '-'), id, userInfo, callback
       else
         console.error error

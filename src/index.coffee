@@ -22,6 +22,7 @@ prompt.get {name: 'folder', description: 'Enter audio folder (with /):'}, (e, re
 
 _downloadAudio = (i) ->
   if tmp.audio[i].isCached is true
+    console.log "“#{tmp.audio[i].artist} — #{tmp.audio[i].title}” is cached."
     i++
     _downloadAudio i
   else

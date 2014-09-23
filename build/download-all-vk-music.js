@@ -1,4 +1,4 @@
-var auth, config, console, database, download, fs, http, mm, open, progress, prompt, random, request, tmp, url, _download, _downloadAudio;
+var auth, config, console, database, download, fs, http, open, progress, prompt, random, request, taglib, tmp, url, _download, _downloadAudio;
 
 config = {
   audioFolder: __dirname + '/audio/',
@@ -54,7 +54,7 @@ auth = function(callback) {
 
 request = require('request');
 
-mm = require('musicmetadata');
+taglib = require('taglib');
 
 database = {
   update: function(callback) {
@@ -67,6 +67,7 @@ database = {
         return database.update();
       }, 1000);
     } else {
+      console.log('Download song\'s list from VK...');
       return request("https://api.vk.com/method/audio.get?owner_id=" + id + "&access_token=" + token + "&v=" + config.vk.version, function(error, response, body) {
         var j, json, _i, _len, _ref;
         if (!error && response.statusCode === 200) {
@@ -79,11 +80,10 @@ database = {
               id: j.id,
               artist: j.artist.replace(/—/, '-'),
               title: j.title.replace(/—/, '-'),
-              duration: j.duration,
               isCached: false
             });
           }
-          console.log('Id\'s sync completed successfully.');
+          console.log('Song\'s list downloaded successfully.');
           return database.cache.get(function(data) {
             database.cache.write(data);
             return callback();
@@ -96,31 +96,24 @@ database = {
   },
   cache: {
     _get: function(i, cachedList, result, callback) {
-      var a, artist, stream, title, _meta;
+      var a, artist, item, path, tag, title, _meta;
       a = cachedList[i];
       _meta = a.substr(0, a.length - 4).split(' — ');
       artist = _meta[0];
       title = _meta[1];
-      stream = fs.createReadStream(config.audioFolder + a);
-      return mm(stream, {
-        duration: true
-      }).on('metadata', function(meta) {
-        result.push({
-          artist: artist,
-          title: title,
-          duration: meta.duration
-        });
-        if (result.length === cachedList.length) {
-          return callback(result);
-        } else {
-          return database.cache._get(++i, cachedList, result, callback);
-        }
-      }).on('done', function(e) {
-        if (e) {
-          console.error(e + ("\nError with " + artist + " — " + title + ".mp3\nTry to delete it and restart."));
-        }
-        return stream.destroy();
-      });
+      path = config.audioFolder + a;
+      tag = taglib.tagSync(path);
+      item = {
+        artist: artist,
+        title: title
+      };
+      item.id = tag.comment ? tag.comment.replace(/\n\n.*/, '').replace(/VK id: ([0-9]+)/, '$1') : '';
+      result.push(item);
+      if (result.length === cachedList.length) {
+        return callback(result);
+      } else {
+        return database.cache._get(++i, cachedList, result, callback);
+      }
     },
     get: function(callback) {
       var cachedList, key, value;
@@ -145,11 +138,10 @@ database = {
           a = _ref[_i];
           for (_j = 0, _len1 = cached.length; _j < _len1; _j++) {
             b = cached[_j];
-            if (a.artist === b.artist && a.title === b.title) {
-              if (a.duration === b.duration || a.duration + 1 === b.duration || a.duration - 1 === b.duration || b.duration === 0) {
-                console.log("“" + a.artist + " — " + a.title + "” is cached.");
-                a.isCached = true;
-              }
+            if (a.id == b.id) {
+              console.log("“" + a.artist + " — " + a.title + "” is cached.");
+              a.isCached = true;
+              break;
             }
           }
         }
@@ -163,8 +155,10 @@ database = {
 
 progress = require('request-progress');
 
-_download = function(link, name, userInfo, callback) {
+_download = function(link, name, id, userInfo, callback) {
+  var path;
   console.clear();
+  path = config.audioFolder + ("" + name + ".mp3");
   userInfo[0]++;
   userInfo[1]++;
   return progress(request(link, function() {
@@ -193,10 +187,14 @@ _download = function(link, name, userInfo, callback) {
     return process.stdout.write(line);
   }).on('error', function(err) {
     return console.error(err);
-  }).pipe(fs.createWriteStream(config.audioFolder + ("" + name + ".mp3"))).on('error', function(err) {
+  }).pipe(fs.createWriteStream(path)).on('error', function(err) {
     return console.error(err);
   }).on('close', function(err) {
+    var tag;
     console.clear();
+    tag = taglib.tagSync(path);
+    tag.comment = "VK id: " + id + "\n\n";
+    tag.saveSync();
     console.log("" + name + " saved successful.");
     return callback();
   });
@@ -217,7 +215,7 @@ download = function(id, userInfo, callback) {
       if (!error && response.statusCode === 200) {
         json = JSON.parse(body);
         j = json.response[0];
-        return _download(j.url, j.artist.replace(/—/, '-') + ' — ' + j.title.replace(/—/, '-'), userInfo, callback);
+        return _download(j.url, j.artist.replace(/—/, '-') + ' — ' + j.title.replace(/—/, '-'), id, userInfo, callback);
       } else {
         return console.error(error);
       }
@@ -259,6 +257,7 @@ prompt.get({
 
 _downloadAudio = function(i) {
   if (tmp.audio[i].isCached === true) {
+    console.log("“" + tmp.audio[i].artist + " — " + tmp.audio[i].title + "” is cached.");
     i++;
     return _downloadAudio(i);
   } else {
