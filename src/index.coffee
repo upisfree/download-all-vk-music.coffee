@@ -26,7 +26,7 @@ _downloadAudio = (i) ->
     i++
     _downloadAudio i
   else
-    download tmp.audio[i].id, [i, tmp.audio.length], ->
+    download tmp.audio[i].id, tmp.audio[i].artist.replace(/—/, '-') + ' — ' + tmp.audio[i].title.replace(/—/, '-'), [i, tmp.audio.length], ->
       if i isnt tmp.audio.length - 1
         i++
         _downloadAudio i

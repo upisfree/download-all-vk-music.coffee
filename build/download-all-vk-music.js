@@ -84,6 +84,7 @@ database = {
             });
           }
           console.log('Song\'s list downloaded successfully.');
+          database.renameDuplicates();
           return database.cache.get(function(data) {
             database.cache.write(data);
             return callback();
@@ -138,10 +139,10 @@ database = {
           a = _ref[_i];
           for (_j = 0, _len1 = cached.length; _j < _len1; _j++) {
             b = cached[_j];
-            if (a.id == b.id) {
+            if (a.artist === b.artist && a.title === a.title && a.id == b.id) {
               console.log("“" + a.artist + " — " + a.title + "” is cached.");
               a.isCached = true;
-              break;
+              continue;
             }
           }
         }
@@ -150,6 +151,38 @@ database = {
         return console.log('There\'s no cached audio.');
       }
     }
+  },
+  renameDuplicates: function() {
+    var a, b, r, _i, _len, _ref, _results;
+    r = /\s\[([0-9]+)\]$/;
+    _ref = tmp.audio;
+    _results = [];
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      a = _ref[_i];
+      _results.push((function() {
+        var _j, _len1, _ref1, _results1;
+        _ref1 = tmp.audio;
+        _results1 = [];
+        for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+          b = _ref1[_j];
+          if (("" + a.artist + " — " + a.title) === ("" + b.artist + " — " + b.title) && a.id !== b.id) {
+            if (b.title.match(r)) {
+              b.title = b.title.replace(r, function(s, p) {
+                var i;
+                i = parseInt(p);
+                i++;
+                return " [" + i + "]";
+              });
+            } else {
+              b.title += ' [1]';
+            }
+          }
+          continue;
+        }
+        return _results1;
+      })());
+    }
+    return _results;
   }
 };
 
@@ -158,9 +191,9 @@ progress = require('request-progress');
 _download = function(link, name, id, userInfo, callback) {
   var path;
   console.clear();
-  path = config.audioFolder + ("" + name + ".mp3");
+  path = config.audioFolder + name + '.mp3';
   userInfo[0]++;
-  userInfo[1]++;
+  userInfo[1] += 2;
   return progress(request(link, function() {
     return {
       throttle: 100
@@ -200,7 +233,7 @@ _download = function(link, name, id, userInfo, callback) {
   });
 };
 
-download = function(id, userInfo, callback) {
+download = function(id, name, userInfo, callback) {
   var token, userId;
   userId = tmp.userId;
   token = tmp.token;
@@ -215,7 +248,7 @@ download = function(id, userInfo, callback) {
       if (!error && response.statusCode === 200) {
         json = JSON.parse(body);
         j = json.response[0];
-        return _download(j.url, j.artist.replace(/—/, '-') + ' — ' + j.title.replace(/—/, '-'), id, userInfo, callback);
+        return _download(j.url, name, id, userInfo, callback);
       } else {
         return console.error(error);
       }
@@ -261,7 +294,7 @@ _downloadAudio = function(i) {
     i++;
     return _downloadAudio(i);
   } else {
-    return download(tmp.audio[i].id, [i, tmp.audio.length], function() {
+    return download(tmp.audio[i].id, tmp.audio[i].artist.replace(/—/, '-') + ' — ' + tmp.audio[i].title.replace(/—/, '-'), [i, tmp.audio.length], function() {
       if (i !== tmp.audio.length - 1) {
         i++;
         return _downloadAudio(i);

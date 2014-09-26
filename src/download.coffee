@@ -1,12 +1,12 @@
-progress   = require 'request-progress'
+progress = require 'request-progress'
 
 _download = (link, name, id, userInfo, callback) ->
   console.clear()
 
-  path = config.audioFolder + "#{name}.mp3"
+  path = config.audioFolder + name + '.mp3'
 
   userInfo[0]++
-  userInfo[1]++
+  userInfo[1] += 2 # I know.
 
   # Download
   progress request link, ->
@@ -47,7 +47,7 @@ _download = (link, name, id, userInfo, callback) ->
 
     callback()
 
-download = (id, userInfo, callback) ->
+download = (id, name, userInfo, callback) ->
   userId = tmp.userId
   token  = tmp.token
 
@@ -61,6 +61,6 @@ download = (id, userInfo, callback) ->
       if not error and response.statusCode is 200
         json = JSON.parse body
         j = json.response[0]
-        _download j.url, j.artist.replace(/—/, '-') + ' — ' + j.title.replace(/—/, '-'), id, userInfo, callback
+        _download j.url, name, id, userInfo, callback
       else
         console.error error

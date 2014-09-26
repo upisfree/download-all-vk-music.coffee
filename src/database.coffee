@@ -24,6 +24,8 @@ database =
             tmp.audio.push {id: j.id, artist: j.artist.replace(/—/, '-'), title: j.title.replace(/—/, '-'), isCached: false}
 
           console.log 'Song\'s list downloaded successfully.'
+
+          database.renameDuplicates()
           
           database.cache.get (data) ->
             database.cache.write data
@@ -67,11 +69,26 @@ database =
       if cached.length isnt 0
         for a in tmp.audio
           for b in cached
-            if `a.id == b.id`
+            if a.artist is b.artist and a.title is a.title and `a.id == b.id` # I'm too lazy to use .toString()
               console.log "“#{a.artist} — #{a.title}” is cached."
               a.isCached = true
-              break;
+              continue;
 
         console.log 'Wrote cached audio to database.'
       else
         console.log 'There\'s no cached audio.'
+
+  renameDuplicates: ->
+    r = /\s\[([0-9]+)\]$/
+
+    for a in tmp.audio
+      for b in tmp.audio
+        if "#{a.artist} — #{a.title}" is "#{b.artist} — #{b.title}" and a.id isnt b.id
+          if b.title.match r # 'name [0]' => 'name [1]'
+            b.title = b.title.replace r, (s, p) ->
+              i = parseInt p
+              i++
+              return " [#{i}]"
+          else
+            b.title += ' [1]'
+        continue
