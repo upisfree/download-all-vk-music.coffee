@@ -7,12 +7,12 @@ database =
     token = tmp.token
 
     if not id or not token
-      console.error 'Sync failed because auth is not loaded now.\nTrying to restart sync...'
+      console.error 'Синхронизация не удалась из-за того, что авторизация ещё не завершилась.\nПробую запустить синхронизацию ещё раз...'
       setTimeout ->
         database.update()
       , 1000
     else
-      console.log 'Download song\'s list from VK...'
+      console.log 'Скачиваю список песен из ВК...'
 
       request "https://api.vk.com/method/audio.get?owner_id=#{id}&access_token=#{token}&v=#{config.vk.version}", (error, response, body) ->
         if not error and response.statusCode is 200
@@ -23,7 +23,7 @@ database =
           for j in json.response.items
             tmp.audio.push {id: j.id, artist: j.artist.replace(/—/, '-'), title: j.title.replace(/—/, '-'), isCached: false}
 
-          console.log 'Song\'s list downloaded successfully.'
+          console.log 'Список песен скачан.'
 
           database.renameDuplicates()
           
@@ -57,7 +57,7 @@ database =
     get: (callback) ->
       cachedList = fs.readdirSync config.audioFolder
 
-      for key, value of cachedList # remove
+      for key, value of cachedList # удалить
         cachedList.splice key, 1 if value is 'data.json'
 
       if cachedList.length isnt 0
@@ -69,14 +69,13 @@ database =
       if cached.length isnt 0
         for a in tmp.audio
           for b in cached
-            if a.artist is b.artist and a.title is a.title and `a.id == b.id` # I'm too lazy to use .toString()
-              console.log "“#{a.artist} — #{a.title}” is cached."
+            if a.artist is b.artist and a.title is a.title and `a.id == b.id` # Я слишком ленив, чтобы использовать .toString()
               a.isCached = true
               continue;
 
-        console.log 'Wrote cached audio to database.'
+        console.log 'Уже загруженные песни отмечены и не будут скачиваться повторно.'
       else
-        console.log 'There\'s no cached audio.'
+        console.log 'Нет загруженных песен.'
 
   renameDuplicates: ->
     r = /\s\[([0-9]+)\]$/

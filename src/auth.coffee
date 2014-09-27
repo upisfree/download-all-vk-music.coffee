@@ -3,7 +3,7 @@ fs   = require 'fs'
 url  = require 'url'
 open = require 'open'
 
-# Open auth page
+# Открываем страницу авторизации
 auth = (callback) ->
   if not tmp.userId or not tmp.token
     open "https://oauth.vk.com/authorize?\
@@ -22,13 +22,13 @@ auth = (callback) ->
           tmp.userId = query.userId
           tmp.token  = query.token
 
-          console.log 'Auth completed successfully.'
+          console.log 'Авторизация прошла успешно.'
 
           callback()
 
           res.end()
 
-        # Get token from html (this is bad solution (or govnokod (yeah, this is govnokod)))
+        # Получаем токен из html (да, плохое решение (или говнокод (да, это говнокод)))
         when 'getTokenHtml'
           fs.readFile __dirname + '/token.html', (e, html) ->
             if e

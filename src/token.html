@@ -1,5 +1,5 @@
 <script>
-// Convert params to array
+// Конвертируем параметры в массив
 var params = location.hash.substr(1).split('&');
 
 for (var i = 0; i <= params.length - 1; i++)
@@ -7,10 +7,12 @@ for (var i = 0; i <= params.length - 1; i++)
   params[i] = params[i].split('=');
 };
 
-// Create get request
+// Стучимся к нашей ноде
 var xhr = new XMLHttpRequest();
 
 xhr.open('POST', 'http://127.0.0.1:8080/?do=getToken&token=' + params[0][1] + '&userId=' + params[2][1], true)
 
 xhr.send();
 </script>
+
+<h1>Эта страница использовалась для авторизации скачивателя песен из ВК.<br>Можно закрыть её.</h1>

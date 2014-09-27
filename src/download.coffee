@@ -6,9 +6,9 @@ _download = (link, name, id, userInfo, callback) ->
   path = config.audioFolder + name + '.mp3'
 
   userInfo[0]++
-  userInfo[1] += 2 # I know.
+  userInfo[1] += 2 # Я знаю.
 
-  # Download
+  # Скачивание
   progress request link, ->
     throttle: 100
   .on 'progress', (state) ->
@@ -28,7 +28,7 @@ _download = (link, name, id, userInfo, callback) ->
 
     process.stdout.cursorTo 0, 1
 
-    line = "#{(state.received / (1024 * 1000)).toFixed(2)} mb / #{(state.total / (1024 * 1000)).toFixed(2)} mb\n#{state.percent}%\n#{userInfo[0]} of #{userInfo[1]}\n#{name}"
+    line = "#{(state.received / (1024 * 1000)).toFixed(2)} mb / #{(state.total / (1024 * 1000)).toFixed(2)} mb\n#{state.percent}%\n#{userInfo[0]} из #{userInfo[1]}\n#{name}"
 
     process.stdout.write line
   .on 'error', (err) ->
@@ -43,7 +43,7 @@ _download = (link, name, id, userInfo, callback) ->
     tag.comment = "VK id: #{id}\n\n"
     tag.saveSync()
 
-    console.log "#{name} saved successful."
+    console.log "#{name} сохранён."
 
     callback()
 
@@ -52,7 +52,7 @@ download = (id, name, userInfo, callback) ->
   token  = tmp.token
 
   if not userId or not token
-    console.error 'Download song failed because auth is not loaded now.\nTrying to restart download...'
+    console.error 'Загрузка песни не удалась, так как авторизация ещё не завершилась.\nПробую перезапустить загрузку...'
     setTimeout ->
       download id, callback
     , 1000

@@ -5,7 +5,7 @@ prompt.colors = false
 prompt.message = prompt.delimiter = ''
 prompt.start()
 
-prompt.get {name: 'folder', description: 'Enter audio folder (with /):'}, (e, result) ->
+prompt.get {name: 'folder', description: 'Введи папку, куда сохранять песни (с / или \\):'}, (e, result) ->
   if e
     console.error e
   else
@@ -14,7 +14,7 @@ prompt.get {name: 'folder', description: 'Enter audio folder (with /):'}, (e, re
     if not fs.existsSync config.audioFolder
       fs.mkdir config.audioFolder, (e) ->
         console.error e
-      console.log config.audioFolder + ' created.'
+      console.log config.audioFolder + ' создана.'
 
     auth ->
       database.update ->
@@ -22,7 +22,9 @@ prompt.get {name: 'folder', description: 'Enter audio folder (with /):'}, (e, re
 
 _downloadAudio = (i) ->
   if tmp.audio[i].isCached is true
-    console.log "“#{tmp.audio[i].artist} — #{tmp.audio[i].title}” is cached."
+    c = "#{tmp.audio[i].artist} — #{tmp.audio[i].title}"
+    quotes = if c.match(/([a-z])/gi) > c.match(/([а-яё])/gi) then ['“', '”'] else ['«', '»']
+    console.log "#{quotes[0]}#{c}#{quotes[1]} уже загружена."
     i++
     _downloadAudio i
   else
@@ -31,4 +33,4 @@ _downloadAudio = (i) ->
         i++
         _downloadAudio i
       else
-        console.log 'All songs downloaded.'
+        console.log 'Все песни загружены.'

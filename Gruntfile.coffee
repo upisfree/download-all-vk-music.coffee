@@ -27,7 +27,7 @@ module.exports = (grunt) ->
     uglify:
       build:
         src: 'build/<%= pkg.name %>.js'
-        dest: 'build/<%= pkg.name %>.min.js'
+        dest: 'build/<%= pkg.name %>.js'
 
     watch:
       coffee:
