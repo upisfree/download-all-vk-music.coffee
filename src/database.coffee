@@ -69,7 +69,7 @@ database =
       if cached.length isnt 0
         for a in tmp.audio
           for b in cached
-            if a.artist is b.artist and a.title is a.title and `a.id == b.id` # Я слишком ленив, чтобы использовать .toString()
+            if "#{a.artist} — #{a.title}".replace(fileNameRegEx, '') is "#{b.artist} — #{b.title}".replace(fileNameRegEx, '') and `a.id == b.id` # Я слишком ленив, чтобы использовать .toString()
               a.isCached = true
               continue;
 
