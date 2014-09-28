@@ -3,7 +3,8 @@ progress = require 'request-progress'
 _download = (link, name, id, userInfo, callback) ->
   console.clear()
 
-  path = config.audioFolder + name + '.mp3'
+  _name = name.substr(0, 255).replace(/[\/\?<>\\:\*\|":\x00-\x1f\x80-\x9f]/g, '') # Убираем запрещённые символы из имени файла
+  path  = config.audioFolder + _name + '.mp3'
 
   userInfo[0]++
   userInfo[1] += 2 # Я знаю.
