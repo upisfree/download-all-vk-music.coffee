@@ -23,9 +23,9 @@ database =
           for j in json.response.items
             tmp.audio.push {id: j.id, artist: j.artist.replace(/—/, '-'), title: j.title.replace(/—/, '-'), isCached: false}
 
-          console.log 'Список песен скачан.'
+          console.log 'Список песен скачан.\nПроверяю уже скачанные песни...'
 
-          database.renameDuplicates()
+          database.rename()
           
           database.cache.get (data) ->
             database.cache.write data
@@ -42,7 +42,7 @@ database =
 
       path = config.audioFolder + a
 
-      tag = taglib.tagSync path
+      tag = taglib.tagSync path # посмотреть ошибку на гитхабе + попробовать синхронно
 
       item = {artist: artist, title: title}
       item.id = if tag.comment then tag.comment.replace(/\n\n.*/, '').replace(/VK id: ([0-9]+)/, '$1') else ''
@@ -66,21 +66,26 @@ database =
         callback []
 
     write: (cached) ->
+      i = 0
       if cached.length isnt 0
         for a in tmp.audio
           for b in cached
             if "#{a.artist} — #{a.title}".replace(fileNameRegEx, '') is "#{b.artist} — #{b.title}".replace(fileNameRegEx, '') and `a.id == b.id` # Я слишком ленив, чтобы использовать .toString()
               a.isCached = true
+              i++
               continue;
 
-        console.log 'Уже загруженные песни отмечены и не будут скачиваться повторно.'
+        console.log 'Закончил проверку уже скачанных песен.\nСкачано песен: ' + i
       else
         console.log 'Нет загруженных песен.'
 
-  renameDuplicates: ->
+  rename: ->
     r = /\s\[([0-9]+)\]$/
 
     for a in tmp.audio
+      a.artist = a.artist.trim()
+      a.title  = a.title.trim()
+
       for b in tmp.audio
         if "#{a.artist} — #{a.title}" is "#{b.artist} — #{b.title}" and a.id isnt b.id
           if b.title.match r # 'name [0]' => 'name [1]'

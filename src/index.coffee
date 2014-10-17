@@ -22,9 +22,6 @@ prompt.get {name: 'folder', description: 'Введи папку, куда сох
 
 _downloadAudio = (i) ->
   if tmp.audio[i].isCached is true
-    c = "#{tmp.audio[i].artist} — #{tmp.audio[i].title}"
-    quotes = if c.match(/([a-z])/gi) > c.match(/([а-яё])/gi) then ['“', '”'] else ['«', '»']
-    console.log "#{quotes[0]}#{c}#{quotes[1]} уже загружена."
     i++
     _downloadAudio i
   else

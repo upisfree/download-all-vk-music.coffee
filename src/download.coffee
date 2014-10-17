@@ -58,7 +58,7 @@ download = (id, name, userInfo, callback) ->
       download id, callback
     , 1000
   else
-    request "https://api.vk.com/method/audio.getById?audios=#{userId}_#{id}&access_token=#{token}&v=#{config.vk.version}", (error, response, body) ->
+    request {url: "https://api.vk.com/method/audio.getById?audios=#{userId}_#{id}&access_token=#{token}&v=#{config.vk.version}", timeout: 600000}, (error, response, body) ->
       if not error and response.statusCode is 200
         json = JSON.parse body
         j = json.response[0]
