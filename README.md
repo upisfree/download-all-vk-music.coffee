@@ -1,4 +1,4 @@
-# download-all-vk-music
+# download-all-vk-music.coffee
 Маленькая программа для скачивания всей музыки [ВК](http://vk.com)
 
 ## Что внутри?
