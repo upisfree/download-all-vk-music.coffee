@@ -1,5 +1,7 @@
 # download-all-vk-music.coffee
-Маленькая программа для скачивания всей музыки [ВК](http://vk.com)
+Маленькая программа для скачивания всей музыки [ВК](http://vk.com).
+
+[ПРОСТЕЙШАЯ РАБОТАЮЩАЯ ВЕРСИЯ НА BASH ЗДЕСЬ](https://github.com/upisfree/download-all-vk-music.sh.git)
 
 ## Что внутри?
  * Скачивание (как ни странно)
